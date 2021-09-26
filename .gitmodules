@@ -1,0 +1,6 @@
+[submodule "blog_004"]
+	path = blog_004
+	url = git@github.com:DivLoic/xke-kingof-scaling.git
+[submodule "blog_005"]
+	path = blog_005
+	url = git@github.com:DivLoic/topic-creation-task.git
