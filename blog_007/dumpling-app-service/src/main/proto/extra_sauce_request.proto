@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package fr.ldivad.dumpling;
+
+option java_multiple_files = true;
+
+message ExtraSauceRequest {
+  int64 timestamp = 1;
+  bool extra_sauce = 2;
+  string user_id = 3;
+  string table_id = 4;
+  string store_id = 5;
+}

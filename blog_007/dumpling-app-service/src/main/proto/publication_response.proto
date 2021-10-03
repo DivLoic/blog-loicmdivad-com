@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package fr.ldivad.dumpling;
+
+option java_multiple_files = true;
+
+message PubResponse {
+  bool success = 1;
+  string message_id = 2;
+  string comment = 3;
+}
