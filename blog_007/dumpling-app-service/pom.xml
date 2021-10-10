@@ -135,7 +135,7 @@
                 <version>${appengine-maven-plugin.version}</version>
                 <configuration>
                     <projectId>${gcp.project}</projectId>
-                    <version>${version}</version>
+                    <version>${project.version}</version>
                 </configuration>
             </plugin>
             <!-- grcp plugins -->

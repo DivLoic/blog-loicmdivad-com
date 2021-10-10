@@ -4,7 +4,7 @@ resource "google_pubsub_topic" "checkout" {
   depends_on = [google_pubsub_schema.checkout]
 
   schema_settings {
-    schema   = "projects/${var.gcp_project}/schemas/dumpling-checkout"
+    schema   = "projects/${var.gcp_project}/schemas/dumpling-checkouts"
     encoding = "BINARY"
   }
 }
