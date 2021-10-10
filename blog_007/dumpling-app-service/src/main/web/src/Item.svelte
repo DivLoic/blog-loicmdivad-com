@@ -25,25 +25,22 @@
     <div class="col">
         <img src={getItem(id).picture} alt={getItem(id).name}/>
     </div>
-    <div class="col-2">
-        <p class="text-truncate">{getItem(id).name}</p>
-    </div>
-    <div class="col">
-        <p class="money text-truncate">{getItem(id).price} €</p>
+    <div class="col-3">
+        <p class="overflow">{getItem(id).name}</p>
     </div>
     <div class="col">
         <Minus id={id}
-               name={getItem(id).price}
+               name={getItem(id).name}
                disabled={disabled}
                on:request={delReq}
                on:response={delRes}/>
     </div>
     <div class="col num-item">
-        <p>{number}</p>
+        <p>{number}  x{getItem(id).price} €</p>
     </div>
     <div class="col">
         <Plus id={id}
-              name={getItem(id).price}
+              name={getItem(id).name}
               disabled={!enable}
               on:request={addReq}
               on:response={addRes}/>
@@ -68,8 +65,10 @@
         margin-bottom: 0;
     }
 
-    p.money {
+    p.overflow {
         overflow: visible;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     div.item {

@@ -27,14 +27,25 @@
             })
     }
 </script>
+
 <p>
-    <button class="btn btn-success delete-item" disabled={disabled} on:click={post} type="button">-</button>
+    <button class="btn btn-success delete-item" disabled={disabled} on:click={post} type="button">
+        -
+    </button>
 </p>
+
 <style>
     p {
         height: 100%;
         line-height: 3rem;
         text-align: center;
         margin-bottom: 0;
+    }
+
+    button:active {
+        transition: 0.1s;
+        color: #188754;
+        border-color: #188754;
+        background-color: white;
     }
 </style>
