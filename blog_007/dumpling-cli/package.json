@@ -1,0 +1,22 @@
+{
+  "name": "dumpling-cli",
+  "version": "1.0.0",
+  "description": "Command line test subscriber",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "cloud",
+    "gcp",
+    "pubsub"
+  ],
+  "author": "loicm.divad@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/pubsub": "^2.18.1",
+    "ora": "^6.0.1",
+    "protobufjs": "^6.11.2"
+  }
+}
