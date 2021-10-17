@@ -4,7 +4,7 @@ resource "google_pubsub_topic" "checkout" {
   depends_on = [google_pubsub_schema.checkout]
 
   schema_settings {
-    schema   = "projects/${var.gcp_project}/schemas/dumpling-checkouts"
+    schema   = "projects/${var.gcp_project}/schemas/${google_pubsub_schema.checkout.name}"
     encoding = "BINARY"
   }
 }
@@ -15,7 +15,7 @@ resource "google_pubsub_topic" "commands" {
   depends_on = [google_pubsub_schema.commands]
 
   schema_settings {
-    schema   = "projects/${var.gcp_project}/schemas/dumpling-commands"
+    schema   = "projects/${var.gcp_project}/schemas/${google_pubsub_schema.commands.name}"
     encoding = "BINARY"
   }
 }

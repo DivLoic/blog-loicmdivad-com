@@ -28,9 +28,11 @@ function format(event) {
     }
 }
 
-function printTable() {
-    if(Records.length >= 9) console.table([oldRecords, ...Records.slice(-8)])
-    else console.table(Records)
+function printTable(records) {
+    console.clear();
+
+    if (records.length < 9) console.table(records)
+    else console.table([oldRecords, ...records.slice(-8)])
 }
 
 function listenForMessages() {
@@ -39,8 +41,7 @@ function listenForMessages() {
     const messageHandler = message => {
         Records.push(format(Command.decode(message.data)));
         stopSpinner(spinner);
-        console.clear();
-        printTable();
+        printTable(Records);
         startSpinner(spinner);
         message.ack();
     };
