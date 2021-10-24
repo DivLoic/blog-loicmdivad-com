@@ -11,8 +11,8 @@
     <properties>
         <gcp.project/>
 
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -67,7 +67,6 @@
             <version>0.4.1</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -86,8 +85,6 @@
             <artifactId>spring-boot-starter-jetty</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -112,9 +109,8 @@
                 <version>1.4.1.Final</version>
             </extension>
         </extensions>
-
+        <!-- spring plugins -->
         <plugins>
-            <!-- spring plugins -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -127,7 +123,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!-- gcp plugins -->
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
@@ -138,7 +133,7 @@
                     <version>${project.version}</version>
                 </configuration>
             </plugin>
-            <!-- grcp plugins -->
+            <!-- protobuf plugins -->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package fr.ldivad.dumpling;
+
+option java_multiple_files = true;
+
+message Cart {
+
+  string cart_id = 1;
+
+  message Product {
+    string item_id = 2;
+    string item_name = 3;
+    int64 price = 4;
+    int64 quantity = 5;
+  }
+
+  map<string, Product> products = 4;
+  int64 total = 5;
+}
