@@ -1,3 +1,6 @@
+.idea/
+
+### java / maven
 *.class
 *.log
 *.ctxt
@@ -24,3 +27,20 @@ buildNumber.properties
 .classpath
 src/main/proto/generated
 src/test/proto/generated
+
+### Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+terraform/.terraform
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+### Project Conventions
+dev.*auto.tfvars
+backend.tf
+template.sh

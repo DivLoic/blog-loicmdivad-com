@@ -1,125 +1,114 @@
 package fr.ldivad.dumpling;
 
-import fr.ldivad.dumpling.Cart.Product;
+import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.Stream;
 import org.apache.beam.sdk.transforms.Combine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CommandAggregator extends Combine.CombineFn<Command, Cart, Cart> {
+public class CommandAggregator extends Combine.CombineFn<Command, CartAccumulator, Cart> {
 
-  @Override
-  public Cart createAccumulator() {
-    return Cart.newBuilder()
-        .setCartId("")
-        .setTotal(0)
+  private final Logger logger = LoggerFactory.getLogger(CommandAggregator.class);
+
+  private Product deriveProduct(final Command command) {
+    return Product
+        .newBuilder()
+        .setItemId(command.getItemId())
+        .setQuantity(command.getOperation() == Command.Operation.ADD ? 1 : -1)
         .build();
   }
 
   @Override
-  public Cart addInput(final Cart mutableAccumulator, final Command input) {
-
-    if (mutableAccumulator.getProductsMap().containsKey(input.getItemId())) {
-      final Product product = mutableAccumulator.getProductsMap().get(input.getItemId());
-      long newCount = (input.getOperation() == Command.Operation.ADD) ? product.getQuantity() + 1
-                                                                      : product.getQuantity() - 1;
-
-      if(newCount > 0) {
-        final Product newProduct = product
-            .newBuilderForType()
-            .setQuantity(newCount)
-            .build();
-        mutableAccumulator.getProductsMap().put(input.getItemId(), newProduct);
-
-      } else {
-        mutableAccumulator.getProductsMap().remove(input.getItemId());
-      }
-
-
-
-    } else {
-      mutableAccumulator
-          .getProductsMap()
-          .put(
-              input.getItemId(),
-              Product
-                  .newBuilder()
-                  .setQuantity(1L)
-                  .setPrice(10)
-                  .setItemId(input.getItemId())
-                  .setItemName(input.getItemName())
-                  .build()
-          );
-    }
-
-    mutableAccumulator
-        .newBuilderForType()
-        .setCartId(input.getSession().getStoreId())
+  public CartAccumulator createAccumulator() {
+    return CartAccumulator
+        .newBuilder()
         .build();
-
-    return mutableAccumulator;
   }
 
   @Override
-  public Cart mergeAccumulators(final Iterable<Cart> accumulators) {
-    final Map<String, List<Product>> cartRows = StreamSupport
-        .stream(accumulators.spliterator(), false)
-        .flatMap((maybeCart) -> Optional
-            .ofNullable(maybeCart)
-            .map(Cart::getProductsMap)
-            .map(Map::entrySet)
-            .orElseGet(Collections::emptySet)
-            .stream()
-        )
+  public CartAccumulator addInput(final CartAccumulator accumulator, final Command input) {
 
-        .collect(
-            Collectors.collectingAndThen(Collectors.groupingBy(Map.Entry::getKey),
-                (entries) -> entries.entrySet().stream().collect(
-                    Collectors.toMap(Map.Entry::getKey, (entry) -> entry.getValue().stream().map(
-                        Map.Entry::getValue).collect(Collectors.toList())))));
+    final Product product = deriveProduct(input);
+    final List<Product> products = Optional.of(accumulator)
+        .map(CartAccumulator::getProductsList)
+        .orElse(Collections.emptyList());
 
-    final Map<String, Product> newProductMap = cartRows.entrySet().stream().flatMap((row) -> {
-      final Optional<Long> quantityInARow =
-          row.getValue().stream().map(Product::getQuantity).reduce(Long::sum);
+    final ImmutableList<Product> plusOneProduct =
+        ImmutableList.<Product>builder().addAll(products).add(product).build();
 
-      return row
-          .getValue()
-          .stream()
-          .findFirst()
-          .flatMap((product) ->
-              quantityInARow.map((quantity) ->
-                  product.newBuilderForType().setQuantity(quantity).build()
-              )
-          ).stream();
-
-    }).collect(Collectors.toMap(Product::getItemId, (product) -> product));
-
-    final Cart newCart = StreamSupport
-        .stream(accumulators.spliterator(), false)
-        .findAny()
-        .orElseGet(() -> Cart.newBuilder().build());
-
-    newCart.getProductsMap().clear();
-    newCart.getProductsMap().putAll(newProductMap);
-
-    return newCart;
+    return CartAccumulator
+        .newBuilder()
+        .addAllProducts(plusOneProduct)
+        .build();
   }
 
   @Override
-  public Cart extractOutput(final Cart accumulator) {
-    final Optional<Long> maybeTotal = Optional
-        .ofNullable(accumulator)
-        .flatMap((acc) -> acc
-            .getProductsMap()
-            .values()
-            .stream()
-            .map((product) -> product.getQuantity() * product.getPrice())
-            .reduce(Long::sum)
-        );
+  public CartAccumulator mergeAccumulators(final Iterable<CartAccumulator> accumulators) {
 
-    return accumulator.newBuilderForType().setTotal(maybeTotal.orElse(0L)).build();
+    final CartAccumulator.Builder accumulatorBuilder = CartAccumulator.newBuilder();
+    accumulators.iterator().forEachRemaining((accumulator) -> {
+      accumulatorBuilder.addAllProducts(accumulator.getProductsList());
+    });
+
+    return accumulatorBuilder.build();
+  }
+
+  @Override
+  public Cart extractOutput(final CartAccumulator accumulator) {
+    final Optional<List<Product>> maybeProductList = Optional
+        .of(accumulator)
+        .map(CartAccumulator::getProductsList);
+
+    maybeProductList.ifPresentOrElse((p) -> {}, () -> logger.warn("Empty accumulator"));
+
+    final List<Product> productsList = maybeProductList.orElse(Collections.emptyList());
+
+    final Map<String, Product> cart = productsList.stream().collect(Collectors.collectingAndThen(
+
+        Collectors.groupingBy(Product::getItemId),
+        (groupedProducts) -> groupedProducts.entrySet().stream().flatMap((itemEntry) -> {
+          final String itemId = itemEntry.getKey();
+          final List<Product> items = itemEntry.getValue();
+
+          final Long itemCount = items
+              .stream()
+              .map(Product::getQuantity)
+              .reduce(Long::sum)
+              .orElse(0L);
+
+          if (itemCount <= 0) {
+            logger.warn("Number of item is going back to zero.");
+            return Stream.empty();
+          } else {
+            final Product result = Product
+                .newBuilder()
+                .setItemId(itemId)
+                .setQuantity(itemCount)
+                .setPrice(MockedCatalog.getProductPriceById(itemId))
+                .build();
+
+            return Stream.of(Map.entry(itemId, result));
+          }
+
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+    ));
+
+    final Long total = cart
+        .values()
+        .stream()
+        .map(MockedCatalog::computeTotalPrice)
+        .reduce(Long::sum)
+        .orElse(0L);
+
+    return Cart
+        .newBuilder()
+        .setTotal(total)
+        .putAllProducts(cart)
+        .build();
   }
 }

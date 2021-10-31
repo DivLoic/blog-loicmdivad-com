@@ -4,17 +4,24 @@ package fr.ldivad.dumpling;
 
 option java_multiple_files = true;
 
+message Product {
+  string item_id = 1;
+  string item_name = 2;
+  int64 price = 3;
+  int64 quantity = 4;
+}
+
+message CartAccumulator {
+  repeated Product products = 1;
+}
+
 message Cart {
+  int64 total = 1;
+  map<string, Product> products = 2;
+}
 
-  string cart_id = 1;
-
-  message Product {
-    string item_id = 2;
-    string item_name = 3;
-    int64 price = 4;
-    int64 quantity = 5;
-  }
-
-  map<string, Product> products = 4;
-  int64 total = 5;
+message UserCart {
+  string user_id = 1;
+  int64 total = 2;
+  map<string, Product> products = 3;
 }

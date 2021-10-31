@@ -1,5 +1,6 @@
 # Dumpling App Service
-###### Terraform manifest of the dumpling-app-service: 
+
+###### Terraform manifest of the dumpling-app-service:
 
 ## Deployment
 
@@ -11,6 +12,7 @@
 ## Usage
 
 Setup the backend configuration in `backend.tf`:
+
 ```hcl
 terraform {
   backend "gcs" {
@@ -21,14 +23,16 @@ terraform {
 ```
 
 Add the following variable in `dev.auto.tfvars`:
+
 ```hcl
-gcp_project = "???"
-gcp_zone = "???"
-gcs_bucket = "???"
+gcp_project        = "???"
+gcp_zone           = "???"
+gcs_bucket         = "???"
 service_account_id = "???"
 ```
 
 Apply the manifest:
+
 ```bash
 terraform apply
 ```

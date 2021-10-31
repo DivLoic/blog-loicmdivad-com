@@ -1,79 +1,69 @@
 package fr.ldivad.dumpling;
 
-import com.google.datastore.v1.Entity;
-import java.awt.Window;
+import fr.ldivad.dumpling.CommandProcessor.CartEntityMapper;
+import fr.ldivad.dumpling.CommandProcessor.KeyValueCommandMapper;
 import java.io.IOException;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.gcp.datastore.DatastoreIO;
+import org.apache.beam.sdk.io.gcp.datastore.DatastoreV1;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.options.StreamingOptions;
 import org.apache.beam.sdk.options.Validation.Required;
+import org.apache.beam.sdk.options.ValueProvider;
 import org.apache.beam.sdk.transforms.Combine;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.windowing.FixedWindows;
-import org.apache.beam.sdk.values.KV;
-import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.sdk.values.TypeDescriptors;
-import org.joda.time.Duration;
 
 
 public class Main {
 
   public interface PubSubToGcsOptions extends PipelineOptions, StreamingOptions {
 
-    @Description("The Cloud Pub/Sub topic subscription to read from.")
     @Required
-    String getInputTopicSubscription();
+    @Description("The Cloud Pub/Sub topic subscription to read from.")
+    ValueProvider<String> getInputTopicSubscription();
 
-    void setInputTopicSubscription(String value);
-  }
+    void setInputTopicSubscription(ValueProvider<String> value);
 
-  static class CartEntityMapper extends DoFn<KV<String, Cart>, Entity> {
+    @Required
+    @Description("The Cloud Datastore project to write to.")
+    ValueProvider<String> getDatastoreProject();
 
-    @ProcessElement
-    public void processElement(@Element KV<String, Cart> cart, OutputReceiver<Entity> out) {
-      final Entity entity = Entity.newBuilder().mergeFrom(cart.getValue()).build();
-      out.output(entity);
-    }
+    void setDatastoreProject(ValueProvider<String> value);
   }
 
   public static void main(String[] args) throws IOException {
-    int numShards = 1;
-
-    PubSubToGcsOptions options =
-        PipelineOptionsFactory.fromArgs(args).withValidation().as(PubSubToGcsOptions.class);
+    PubSubToGcsOptions options = PipelineOptionsFactory
+        .fromArgs(args)
+        .withValidation()
+        .as(PubSubToGcsOptions.class);
 
     options.setStreaming(true);
 
     Pipeline pipeline = Pipeline.create(options);
 
-    final MapElements<?, KV<String, Command>> idCommandPair = MapElements.into(
-        TypeDescriptors.kvs(TypeDescriptors.strings(), TypeDescriptor.of(Command.class)));
-
-    final PubsubIO.Read<Command> commandReader = PubsubIO
+    final PubsubIO.Read<Command> readFromPubSub = PubsubIO
         .readProtos(Command.class)
         .fromSubscription(options.getInputTopicSubscription());
 
+    final DatastoreV1.Write writeInDatastore =
+        DatastoreIO.v1().write().withProjectId(options.getDatastoreProject());
+
     pipeline
-        .apply("Read PubSub Messages", commandReader)
+        .apply("Read PubSub Messages", readFromPubSub)
 
-        .apply("Break command into key value pairs (session - command)",
-            idCommandPair.via((command) -> KV.of(command.getSession().getUserId(), command))
-        )
+        .apply("Map in key/value pairs", new KeyValueCommandMapper().map())
 
-        .apply(Window.into(FixedWindows.of(Duration.standardDays(1))))
+        .apply("Group command in 3h windows", CommandProcessor.windowingCommand())
 
-        .apply(Combine.perKey(new CommandAggregator()))
+        .apply("Group command per key", Combine.perKey(new CommandAggregator()))
 
-        .apply(ParDo.of(new CartEntityMapper()))
+        .apply("Format user cart for Datastore", ParDo.of(new CartEntityMapper()))
 
-        .apply(DatastoreIO.v1().write().withProjectId("loicmdivad"));
+        .apply("Write Datastore cart state", writeInDatastore);
 
-    pipeline.run().waitUntilFinish();
+    pipeline.run();
   }
 }
