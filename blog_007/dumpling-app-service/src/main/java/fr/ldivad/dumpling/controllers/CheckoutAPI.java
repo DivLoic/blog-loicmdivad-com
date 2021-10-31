@@ -1,5 +1,6 @@
 package fr.ldivad.dumpling.controllers;
 
+import fr.ldivad.dumpling.Checkout;
 import fr.ldivad.dumpling.Command;
 import fr.ldivad.dumpling.PubResponse;
 import fr.ldivad.dumpling.pubsub.CheckoutPublisher;
@@ -29,11 +30,11 @@ public class CheckoutAPI {
   }
 
   @PostMapping(path ="/checkout/", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<PubResponse> addCommand(@RequestBody Command command) {
+  public ResponseEntity<PubResponse> addCommand(@RequestBody Checkout checkout) {
     logger.info("CALL TO CHECKOUT \uD83D\uDCB8");
 
     return publisher
-        .publish(template, command)
+        .publish(template, checkout)
         .onFailure((failure) -> logger.error("Fail to publish a checkout ", failure))
         .onSuccess((message) -> logger.info("Successfully published: " + message))
         .map(PubSubController::ok)

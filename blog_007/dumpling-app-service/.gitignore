@@ -34,6 +34,6 @@ hs_err_pid*
 target/
 
 ### Project Conventions
+.mvn/
 dev.*auto.tfvars
 backend.tf
-src/main/resources/public/

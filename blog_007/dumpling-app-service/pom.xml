@@ -10,6 +10,9 @@
 
     <properties>
         <gcp.project/>
+        <appengine.port/>
+        <topic.command/>
+        <topic.checkout/>
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -91,6 +94,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources/</directory>
+                <filtering>true</filtering>
             </resource>
             <resource>
                 <directory>src/main/web/</directory>
@@ -130,7 +134,7 @@
                 <version>${appengine-maven-plugin.version}</version>
                 <configuration>
                     <projectId>${gcp.project}</projectId>
-                    <version>${project.version}</version>
+                    <version>0-1-0-snapshot</version>
                 </configuration>
             </plugin>
             <!-- protobuf plugins -->

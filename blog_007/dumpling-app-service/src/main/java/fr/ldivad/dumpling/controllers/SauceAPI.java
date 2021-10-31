@@ -1,9 +1,8 @@
 package fr.ldivad.dumpling.controllers;
 
-import fr.ldivad.dumpling.Command;
 import fr.ldivad.dumpling.ExtraSauceRequest;
 import fr.ldivad.dumpling.PubResponse;
-import fr.ldivad.dumpling.pubsub.CommandPublisher;
+import fr.ldivad.dumpling.pubsub.SaucePublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class SauceAPI {
   private final Logger logger = LoggerFactory.getLogger(CommandAPI.class);
 
   @Autowired
-  private CommandPublisher publisher;
+  private SaucePublisher publisher;
 
   public SauceAPI(PubSubTemplate template) {
     this.template = template;
@@ -40,6 +39,5 @@ public class SauceAPI {
         .map(PubSubController::ok)
         .recover(PubSubController::fail);
   }
-
 }
 
