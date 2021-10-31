@@ -1,11 +1,11 @@
-const subscriptionName = 'projects/loicmdivad/subscriptions/test-command';
+const subscriptionName = process.env.SUBSCRIPTION_NAME;
 const timeout = 60;
 
 import {PubSub} from '@google-cloud/pubsub';
 import {Command, Format} from './lib/proto.js';
 import {startSpinner, initSpinner, stopSpinner} from './lib/spinner.js';
 
-const spinner = initSpinner();
+const spinner = initSpinner(subscriptionName);
 
 const pubSubClient = new PubSub();
 

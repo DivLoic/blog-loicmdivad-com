@@ -30,4 +30,3 @@ export const Format = {
     operation: (cmd) => OperationMessage.valuesById[cmd["operation"]],
     date: (cmd) => new Date(parseInt(cmd["event_time"])).toLocaleString("en-GB"),
 }
-
