@@ -1,15 +1,15 @@
 # Dumpling App Service
 
-###### Code example of the blog post: [dumpling-app](../blog_007/)
+###### Code example of the blog post: [dumpling-app](../)
 
 This module represents the interface and publisher of a kiosk-app. A simple menu built in Svelte
 calls a Spring Boot on AppEngine at each click. Finally, a Cloud Pub?sub message is publish to
-indicate that a item has been added or removed from the user shopping cart. Find more in the
+indicate that an item has been added or removed from the user shopping cart. Find more in the
 article: [Explore data contracts with Cloud Pub/Sub](https://blog.loicmdivad.com/posts/2020/04/explore-data-contracts-with-cloud-pub-sub)
 
 ## Story
 
-The Dumpling Store has an application to order food in store. The dumpling-app produces records in
+The Dumpling Store has an application to order food on site. The dumpling-app produces records in
 Cloud Pub/Sub topic everytime a user click on the interface. This module uses the Pub/Sub Message
 Schema feature to enforce the structure of record produced by the app. Doing so the subscribers such
 as [dumpling-app-processor](../dumpling-app-processor/) is less likely to face a corrupted message.

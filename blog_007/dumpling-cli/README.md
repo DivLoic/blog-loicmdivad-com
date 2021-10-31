@@ -1,6 +1,6 @@
 # Dumpling App Cli
 
-###### Code example of the blog post: [dumpling-app](../blog_007/)
+###### Code example of the blog post: [dumpling-app](../)
 
 Subscribes to a Pub/Sub topic and format the output to showcase the result of the
 application [../dumpling-app-service](../dumpling-app-service)
