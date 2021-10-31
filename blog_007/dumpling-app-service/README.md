@@ -76,19 +76,22 @@ terraform apply
 3. Build the front end app by passing the AppEngine endpoint
 
 ```bash
-API_ADDRESS=<app-engine-address> npm build
+cd src/main/web/
+API_ADDRESS=<app-engine-address> npm run build
 ```
 
 4. Upload the packed application in gcp
 
 ```bash
-mvn appengine:deploy -s .mvn/settings.xml
+mvn package appengine:deploy -s .mvn/settings.xml
 ```
 
 5. Take the a look at the app
 
 ```bash
 gcloud app logs tail -s dumpling-app-service
+# then
+gcloud app browse -s dumpling-app-service
 ```
 
 ## Improvement 

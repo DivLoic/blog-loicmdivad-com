@@ -13,6 +13,8 @@ The Dumpling Store has an application to order food on site. The dumpling-app pr
 Cloud Pub/Sub topic everytime a user click on the interface. This module consumes order event and
 computes user shopping cart in realtime by levering the Pub/Sub Message schema feature.
 
+![example](../_resources/images/shopping-cart-state-in-datastore3.png)
+
 ## Plugin
 
 The team producing the input records owns the record schema. So we can't just copy the schema in

@@ -18,4 +18,4 @@ with the nes Pub/Sub Message Schema feature. This module aggregates different pa
 - [X] [pubsub-schema-maven-plugin](./pubsub-schema-maven-plugin/)
 - [X] [dumpling-cli](./dumpling-cli/) (demo only)
 
-
+![example](_resources/images/front-end-screen-shot1.png)

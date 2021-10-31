@@ -88,7 +88,7 @@
         padding: 1rem 1rem;
     }
 
-    div.modal-body{
+    div.modal-body {
         color: dimgrey;
         font-size: 0.8rem;
         word-break: break-all;
@@ -123,31 +123,32 @@
     .tgl,
     .tgl:after,
     .tgl:before,
-    .tgl *,
-    .tgl *:after,
-    .tgl *:before,
     .tgl + .tgl-btn {
         box-sizing: border-box;
+        /**
+            .tgl *,
+            .tgl *:after,
+            .tgl *:before,
+         */
     }
 
     .tgl::-moz-selection,
     .tgl:after::-moz-selection,
     .tgl:before::-moz-selection,
-    .tgl *::-moz-selection,
-    .tgl *:after::-moz-selection,
-    .tgl *:before::-moz-selection,
-    .tgl + .tgl-btn::-moz-selection {
-        background: none;
-    }
-
+    .tgl + .tgl-btn::-moz-selection,
     .tgl::selection,
     .tgl:after::selection,
-    .tgl:before::selection,
-    .tgl *::selection,
-    .tgl *:after::selection,
-    .tgl *:before::selection,
     .tgl + .tgl-btn::selection {
         background: none;
+        /*
+        .tgl *::-moz-selection,
+        .tgl *:after::-moz-selection,
+        .tgl *:before::-moz-selection,
+        .tgl *::selection,
+        .tgl *:after::selection,
+        .tgl *:before::selection,
+        .tgl:before::selection,
+        */
     }
 
     .tgl + .tgl-btn {

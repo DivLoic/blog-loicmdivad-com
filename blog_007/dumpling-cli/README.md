@@ -11,3 +11,5 @@ application [../dumpling-app-service](../dumpling-app-service)
 npm install
 SUBSCRIPTION_NAME='projects/?/subscriptions/?' npm start
 ```
+
+![Example](../_resources/images/dumpling-cli-screenshot.png)
