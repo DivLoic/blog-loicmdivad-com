@@ -4,3 +4,6 @@
 [submodule "blog_005"]
 	path = blog_005
 	url = git@github.com:DivLoic/topic-creation-task.git
+[submodule "blog_008"]
+	path = blog_008
+	url = git@github.com:DivLoic/ccloud-registry-action.git
